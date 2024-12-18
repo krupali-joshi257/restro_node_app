@@ -5,9 +5,10 @@ const newOrder = async (req, res) => {
 
   try {
     const newOrder = await db.Order.create({
-      user_id,
+      userId: user_id,
       items,
-      status: "delivered" || "pending",
+      status: "pending",
+      order_date: new Date(),
     });
     res.status(201).json(newOrder);
   } catch (error) {
@@ -28,13 +29,19 @@ const orderById = async (req, res) => {
   }
 };
 const getOrders = async (req, res) => {
-  console.log("call get order");
   //   const { user_id } = req.query;
 
   try {
     const orders = await db.Order.findAll({
-      where: { user_id: 1 },
+      where: { userId: 1 },
+      include: [
+        {
+          model: db.User,
+          as: "user",
+        },
+      ],
     });
+
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: error.message });
